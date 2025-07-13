@@ -1,10 +1,19 @@
-name: Insta Bulk Creator
+name: Instagram Bulk Creator
 
 on:
   workflow_dispatch:
+    inputs:
+      ACCOUNT_COUNT:
+        description: 'Number of accounts to create'
+        required: true
+        default: '1'
+      PASSWORD_SUFFIX:
+        description: 'Password suffix to append'
+        required: true
+        default: '123'
 
 jobs:
-  create_accounts:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,16 +23,19 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '20'
+        node-version: '18'
 
     - name: Install dependencies
       run: npm install
 
-    - name: Run script
+    - name: Run account creator
+      env:
+        ACCOUNT_COUNT: ${{ github.event.inputs.ACCOUNT_COUNT }}
+        PASSWORD_SUFFIX: ${{ github.event.inputs.PASSWORD_SUFFIX }}
       run: node index.js
 
-    - name: Upload accounts.csv
-      uses: actions/upload-artifact@v3
+    - name: Upload accounts CSV
+      uses: actions/upload-artifact@v4
       with:
         name: insta-accounts
         path: accounts.csv
